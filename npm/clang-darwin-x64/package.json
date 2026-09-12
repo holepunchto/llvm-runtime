@@ -1,0 +1,61 @@
+{
+  "name": "llvm-runtime-clang-darwin-x64",
+  "version": "22.1.8",
+  "description": "The macOS Intel 64-bit binaries for the LLVM compiler",
+  "exports": {
+    ".": "./index.js",
+    "./package": "./package.json"
+  },
+  "bin": {
+    "clang": "bin/clang",
+    "clang++": "bin/clang++",
+    "clang-cl": "bin/clang-cl",
+    "clang-cpp": "bin/clang-cpp",
+    "clang-scan-deps": "bin/clang-scan-deps",
+    "llvm-ar": "bin/llvm-ar",
+    "llvm-cov": "bin/llvm-cov",
+    "llvm-cxxfilt": "bin/llvm-cxxfilt",
+    "llvm-dwarfdump": "bin/llvm-dwarfdump",
+    "llvm-lib": "bin/llvm-lib",
+    "llvm-nm": "bin/llvm-nm",
+    "llvm-objcopy": "bin/llvm-objcopy",
+    "llvm-objdump": "bin/llvm-objdump",
+    "llvm-profdata": "bin/llvm-profdata",
+    "llvm-ranlib": "bin/llvm-ranlib",
+    "llvm-rc": "bin/llvm-rc",
+    "llvm-readobj": "bin/llvm-readobj",
+    "llvm-size": "bin/llvm-size",
+    "llvm-strings": "bin/llvm-strings",
+    "llvm-strip": "bin/llvm-strip",
+    "llvm-symbolizer": "bin/llvm-symbolizer"
+  },
+  "files": [
+    "NOTICE",
+    "index.js",
+    "bin",
+    "lib"
+  ],
+  "assets": [
+    "bin",
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holepunchto/llvm-runtime.git"
+  },
+  "author": "Holepunch",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/holepunchto/llvm-runtime/issues"
+  },
+  "homepage": "https://github.com/holepunchto/llvm-runtime#readme",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "dependencies": {
+    "require-asset": "^1.2.3"
+  }
+}
