@@ -1,0 +1,43 @@
+{
+  "name": "llvm-runtime-lld-win32-arm64",
+  "version": "22.1.8",
+  "description": "The Windows ARM 64-bit binaries for the LLVM linker",
+  "exports": {
+    ".": "./index.js",
+    "./package": "./package.json"
+  },
+  "bin": {
+    "ld.lld": "bin/ld.lld.exe",
+    "ld64.lld": "bin/ld64.lld.exe",
+    "lld": "bin/lld.exe",
+    "lld-link": "bin/lld-link.exe",
+    "wasm-ld": "bin/wasm-ld.exe"
+  },
+  "files": [
+    "NOTICE",
+    "index.js",
+    "bin"
+  ],
+  "assets": [
+    "bin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holepunchto/llvm-runtime.git"
+  },
+  "author": "Holepunch",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/holepunchto/llvm-runtime/issues"
+  },
+  "homepage": "https://github.com/holepunchto/llvm-runtime#readme",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "arm64"
+  ],
+  "dependencies": {
+    "require-asset": "^1.2.3"
+  }
+}

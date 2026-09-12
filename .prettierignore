@@ -1,0 +1,4 @@
+npm/**/bin/**
+npm/**/include/**
+npm/**/lib/**
+npm/**/share/**

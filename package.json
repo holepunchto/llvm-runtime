@@ -1,0 +1,110 @@
+{
+  "name": "llvm-runtime",
+  "version": "22.1.8",
+  "description": "Prebuilt LLVM toolchains for macOS, Linux, and Windows",
+  "exports": {
+    ".": "./index.js",
+    "./package": "./package.json",
+    "./resource-dir": "./lib/resource-dir.js",
+    "./spawn": "./lib/spawn.js"
+  },
+  "bin": {
+    "clang": "bin/clang",
+    "clang++": "bin/clang++",
+    "clang-cl": "bin/clang-cl",
+    "clang-cpp": "bin/clang-cpp",
+    "clang-scan-deps": "bin/clang-scan-deps",
+    "ld.lld": "bin/ld.lld",
+    "ld64.lld": "bin/ld64.lld",
+    "lld": "bin/lld",
+    "lld-link": "bin/lld-link",
+    "llvm-ar": "bin/llvm-ar",
+    "llvm-cov": "bin/llvm-cov",
+    "llvm-cxxfilt": "bin/llvm-cxxfilt",
+    "llvm-dwarfdump": "bin/llvm-dwarfdump",
+    "llvm-lib": "bin/llvm-lib",
+    "llvm-nm": "bin/llvm-nm",
+    "llvm-objcopy": "bin/llvm-objcopy",
+    "llvm-objdump": "bin/llvm-objdump",
+    "llvm-profdata": "bin/llvm-profdata",
+    "llvm-ranlib": "bin/llvm-ranlib",
+    "llvm-rc": "bin/llvm-rc",
+    "llvm-readobj": "bin/llvm-readobj",
+    "llvm-size": "bin/llvm-size",
+    "llvm-strings": "bin/llvm-strings",
+    "llvm-strip": "bin/llvm-strip",
+    "llvm-symbolizer": "bin/llvm-symbolizer",
+    "wasm-ld": "bin/wasm-ld"
+  },
+  "files": [
+    "NOTICE",
+    "index.js",
+    "bin",
+    "lib"
+  ],
+  "workspaces": [
+    "npm/*"
+  ],
+  "imports": {
+    "child_process": {
+      "bare": "bare-subprocess",
+      "default": "child_process"
+    },
+    "fs": {
+      "bare": "bare-fs",
+      "default": "fs"
+    },
+    "os": {
+      "bare": "bare-os",
+      "default": "os"
+    },
+    "path": {
+      "bare": "bare-path",
+      "default": "path"
+    }
+  },
+  "scripts": {
+    "format": "prettier --write . && lunte --fix",
+    "lint": "prettier --check . && lunte"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holepunchto/llvm-runtime.git"
+  },
+  "author": "Holepunch",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/holepunchto/llvm-runtime/issues"
+  },
+  "homepage": "https://github.com/holepunchto/llvm-runtime#readme",
+  "dependencies": {
+    "bare-fs": "^4.4.4",
+    "bare-os": "^3.0.1",
+    "bare-path": "^3.0.0",
+    "bare-subprocess": "^5.0.0"
+  },
+  "optionalDependencies": {
+    "llvm-runtime-clang-darwin-arm64": "22.1.8",
+    "llvm-runtime-clang-darwin-x64": "22.1.8",
+    "llvm-runtime-clang-linux-arm64": "22.1.8",
+    "llvm-runtime-clang-linux-x64": "22.1.8",
+    "llvm-runtime-clang-win32-arm64": "22.1.8",
+    "llvm-runtime-clang-win32-x64": "22.1.8",
+    "llvm-runtime-lld-darwin-arm64": "22.1.8",
+    "llvm-runtime-lld-darwin-x64": "22.1.8",
+    "llvm-runtime-lld-linux-arm64": "22.1.8",
+    "llvm-runtime-lld-linux-x64": "22.1.8",
+    "llvm-runtime-lld-win32-arm64": "22.1.8",
+    "llvm-runtime-lld-win32-x64": "22.1.8",
+    "llvm-runtime-resources-darwin": "22.1.8",
+    "llvm-runtime-resources-linux": "22.1.8",
+    "llvm-runtime-resources-win32": "22.1.8"
+  },
+  "devDependencies": {
+    "cmake-bare": "^1.9.0",
+    "cmake-fetch": "^1.4.9",
+    "lunte": "^1.6.0",
+    "prettier": "^3.6.2",
+    "prettier-config-holepunch": "^2.0.0"
+  }
+}

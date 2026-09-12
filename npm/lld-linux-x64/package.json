@@ -1,0 +1,44 @@
+{
+  "name": "llvm-runtime-lld-linux-x64",
+  "version": "22.1.8",
+  "description": "The Linux Intel 64-bit binaries for the LLVM linker",
+  "exports": {
+    ".": "./index.js",
+    "./package": "./package.json"
+  },
+  "bin": {
+    "ld.lld": "bin/ld.lld",
+    "ld64.lld": "bin/ld64.lld",
+    "lld": "bin/lld",
+    "lld-link": "bin/lld-link",
+    "wasm-ld": "bin/wasm-ld"
+  },
+  "files": [
+    "NOTICE",
+    "index.js",
+    "bin"
+  ],
+  "assets": [
+    "bin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holepunchto/llvm-runtime.git"
+  },
+  "author": "Holepunch",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/holepunchto/llvm-runtime/issues"
+  },
+  "homepage": "https://github.com/holepunchto/llvm-runtime#readme",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "dependencies": {
+    "llvm-runtime-clang-linux-x64": "22.1.8",
+    "require-asset": "^1.2.3"
+  }
+}
