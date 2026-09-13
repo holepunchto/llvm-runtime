@@ -6,12 +6,15 @@ include_guard()
 function(llvm_args platform target result)
   set(components
     clang
+    clang-format
     clang-resource-headers
     clang-scan-deps
     lld
     llvm-ar
+    llvm-config
     llvm-cov
     llvm-cxxfilt
+    llvm-cxxmap
     llvm-dwarfdump
     llvm-lib
     llvm-nm
@@ -25,7 +28,34 @@ function(llvm_args platform target result)
     llvm-strings
     llvm-strip
     llvm-symbolizer
+    sancov
+    sanstats
   )
+
+  # Tools tied to one object format. Several are aliases of tools already in the
+  # list above, and an alias installs as a copy rather than a symlink, so
+  # shipping them everywhere would not be free.
+  if(platform STREQUAL "darwin")
+    list(APPEND components
+      dsymutil
+      llvm-install-name-tool
+      llvm-libtool-darwin
+      llvm-lipo
+      llvm-otool
+    )
+  elseif(platform STREQUAL "linux")
+    list(APPEND components
+      llvm-addr2line
+      llvm-readelf
+    )
+  elseif(platform STREQUAL "win32")
+    list(APPEND components
+      llvm-dlltool
+      llvm-ml
+      llvm-ml64
+      llvm-windres
+    )
+  endif()
 
   set(args
     -DLLVM_ENABLE_PROJECTS=clang|lld
