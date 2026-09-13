@@ -59,10 +59,9 @@ function(llvm_args platform target result)
     list(APPEND args
       -DLLVM_BUILD_LLVM_DYLIB=ON
       -DLLVM_LINK_LLVM_DYLIB=ON
-      -DCLANG_LINK_CLANG_DYLIB=ON
     )
 
-    list(APPEND components LLVM clang-cpp)
+    list(APPEND components LLVM)
 
     if(platform STREQUAL "win32")
       # `LLVM_BUILD_LLVM_DYLIB` is a `cmake_dependent_option()` that MSVC
@@ -72,8 +71,20 @@ function(llvm_args platform target result)
       # `LLVM_DYLIB_EXPORT_INLINES` is deliberately left alone: it exists to
       # make a clang-cl built DLL consumable from MSVC, which nothing we ship
       # is, and a Windows DLL may export at most 65,535 symbols.
-      list(APPEND args -DLLVM_BUILD_LLVM_DYLIB_VIS=ON)
+      #
+      # clang is a different matter. Its public API carries almost none of the
+      # export annotations that LLVM's does, so nothing it declares reaches a
+      # DLL's export table and the drivers cannot link against one. They link
+      # clang statically and share LLVM alone.
+      list(APPEND args
+        -DLLVM_BUILD_LLVM_DYLIB_VIS=ON
+        -DCLANG_LINK_CLANG_DYLIB=OFF
+      )
     else()
+      list(APPEND args -DCLANG_LINK_CLANG_DYLIB=ON)
+
+      list(APPEND components clang-cpp)
+
       # The shared libraries ship in the compiler package, so lld has to reach
       # across to its sibling to find them. npm resolves both packages from the
       # same parent, which keeps them siblings whether it hoists them or nests
