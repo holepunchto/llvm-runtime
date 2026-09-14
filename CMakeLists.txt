@@ -51,7 +51,7 @@ if(platform STREQUAL "win32")
     "-DCMAKE_INSTALL_PREFIX=${libxml2}"
     "-DCMAKE_BUILD_TYPE=Release"
     "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
-    -DBUILD_SHARED_LIBS=OFF
+    -DBUILD_SHARED_LIBS=ON
 
     -DLIBXML2_WITH_ICONV=OFF
     -DLIBXML2_WITH_MODULES=OFF
@@ -193,6 +193,16 @@ install(
   FILES_MATCHING
     REGEX "${linkers}"
 )
+
+if(platform STREQUAL "win32")
+  install(
+    DIRECTORY "${libxml2}/bin/"
+    DESTINATION "clang-${target}/bin"
+    USE_SOURCE_PERMISSIONS
+    FILES_MATCHING
+      PATTERN "*.dll"
+  )
+endif()
 
 if(LLVM_RUNTIME_SHARED AND platform STREQUAL "win32")
   install(

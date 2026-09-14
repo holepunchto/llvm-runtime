@@ -68,6 +68,7 @@ function(llvm_args platform target libxml2 result)
     -DLLVM_ENABLE_LIBPFM=OFF
     -DLLVM_ENABLE_PLUGINS=OFF
     -DLLVM_ENABLE_TERMINFO=OFF
+    -DLLVM_ENABLE_ZLIB=OFF
     -DLLVM_ENABLE_ZSTD=OFF
     -DLLVM_INCLUDE_BENCHMARKS=OFF
     -DLLVM_INCLUDE_DOCS=OFF
@@ -87,15 +88,14 @@ function(llvm_args platform target libxml2 result)
   # not depend on what the build machine happens to have. `FORCE_ON` turns a
   # missing one into a configure failure rather than a silently absent tool.
   if(platform STREQUAL "win32")
-    # `FindLibXml2` searches for `xml2` and `libxml2`, and a static MSVC release
-    # build is neither: libxml2 appends an `s`. The definition normally arrives
-    # from pkg-config, and without it the headers declare every symbol
-    # `dllimport` and the link against the static library fails.
+    # libxml2 is a DLL rather than a static library because `FindLibXml2`
+    # describes it with a path alone. A static one on Windows also needs
+    # `bcrypt`, which is a usage requirement the imported target cannot carry,
+    # and names its release build `libxml2s`, which is not among the names the
+    # module looks for.
     list(APPEND args
       -DLLVM_ENABLE_LIBXML2=FORCE_ON
-      "-DLIBXML2_INCLUDE_DIR=${libxml2}/include/libxml2"
-      "-DLIBXML2_LIBRARY=${libxml2}/lib/libxml2s.lib"
-      -DLIBXML2_DEFINITIONS=-DLIBXML_STATIC
+      "-DCMAKE_PREFIX_PATH=${libxml2}"
     )
   else()
     list(APPEND args -DLLVM_ENABLE_LIBXML2=OFF)
