@@ -38,7 +38,7 @@ fetch_package(
 
 set(libxml2 "${CMAKE_CURRENT_BINARY_DIR}/libxml2")
 
-set(libxml2_library "${CMAKE_CURRENT_BINARY_DIR}/libxml2-library/xml2${CMAKE_IMPORT_LIBRARY_SUFFIX}")
+set(libxml2_library "${CMAKE_CURRENT_BINARY_DIR}/libxml2-library/xml2${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
 set(dependencies)
 
@@ -53,7 +53,7 @@ if(platform STREQUAL "win32")
     "-DCMAKE_INSTALL_PREFIX=${libxml2}"
     "-DCMAKE_BUILD_TYPE=Release"
     "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
-    -DBUILD_SHARED_LIBS=ON
+    -DBUILD_SHARED_LIBS=OFF
 
     -DLIBXML2_WITH_ICONV=OFF
     -DLIBXML2_WITH_MODULES=OFF
@@ -80,7 +80,7 @@ if(platform STREQUAL "win32")
     COMMAND
       ${CMAKE_COMMAND}
         -D "directory=${libxml2}/lib"
-        -D "pattern=*xml2*${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+        -D "pattern=*xml2*${CMAKE_STATIC_LIBRARY_SUFFIX}"
         -D "destination=${libxml2_library}"
         -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/copy-library.cmake"
     USES_TERMINAL_CONFIGURE ON
@@ -205,16 +205,6 @@ install(
   FILES_MATCHING
     REGEX "${linkers}"
 )
-
-if(platform STREQUAL "win32")
-  install(
-    DIRECTORY "${libxml2}/bin/"
-    DESTINATION "clang-${target}/bin"
-    USE_SOURCE_PERMISSIONS
-    FILES_MATCHING
-      PATTERN "*.dll"
-  )
-endif()
 
 if(LLVM_RUNTIME_SHARED AND platform STREQUAL "win32")
   install(

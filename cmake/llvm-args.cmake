@@ -88,15 +88,24 @@ function(llvm_args platform target libxml2 libxml2_library result)
   # not depend on what the build machine happens to have. `FORCE_ON` turns a
   # missing one into a configure failure rather than a silently absent tool.
   if(platform STREQUAL "win32")
-    # libxml2 is a DLL rather than a static library: a static one on Windows
-    # needs `bcrypt`, and that is a usage requirement `FindLibXml2` cannot
-    # carry, describing a library by path alone. The path is one we copied the
-    # build's output to, so neither of us has to agree with the other on how
-    # libxml2 spells it.
+    # libxml2 is linked into LLVM statically. A DLL would become a load time
+    # dependency of everything, since the components share one library, and it
+    # would have to be placed beside every copy of it we ship.
+    #
+    # The path is one we copied the build's output to, so neither of us has to
+    # agree with the other on how libxml2 spells it. `LIBXML_STATIC` reaches
+    # the compile through `FindLibXml2`, which would otherwise take it from
+    # pkg-config, and without it every declaration is `dllimport`.
+    #
+    # `bcrypt` is libxml2's own dependency, named here because `FindLibXml2`
+    # describes a library by path alone and has nowhere to record one.
     list(APPEND args
       -DLLVM_ENABLE_LIBXML2=FORCE_ON
       "-DLIBXML2_INCLUDE_DIR=${libxml2}/include/libxml2"
       "-DLIBXML2_LIBRARY=${libxml2_library}"
+      -DLIBXML2_DEFINITIONS=-DLIBXML_STATIC
+      -DCMAKE_EXE_LINKER_FLAGS=/DEFAULTLIB:bcrypt.lib
+      -DCMAKE_SHARED_LINKER_FLAGS=/DEFAULTLIB:bcrypt.lib
     )
   else()
     list(APPEND args -DLLVM_ENABLE_LIBXML2=OFF)
