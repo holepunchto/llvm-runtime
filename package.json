@@ -34,6 +34,7 @@
     "llvm-lipo": "bin/llvm-lipo",
     "llvm-ml": "bin/llvm-ml",
     "llvm-ml64": "bin/llvm-ml64",
+    "llvm-mt": "bin/llvm-mt",
     "llvm-nm": "bin/llvm-nm",
     "llvm-objcopy": "bin/llvm-objcopy",
     "llvm-objdump": "bin/llvm-objdump",

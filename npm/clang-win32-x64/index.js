@@ -16,6 +16,7 @@ exports['llvm-dwarfdump'] = require.asset('./bin/llvm-dwarfdump.exe', __filename
 exports['llvm-lib'] = require.asset('./bin/llvm-lib.exe', __filename)
 exports['llvm-ml'] = require.asset('./bin/llvm-ml.exe', __filename)
 exports['llvm-ml64'] = require.asset('./bin/llvm-ml64.exe', __filename)
+exports['llvm-mt'] = require.asset('./bin/llvm-mt.exe', __filename)
 exports['llvm-nm'] = require.asset('./bin/llvm-nm.exe', __filename)
 exports['llvm-objcopy'] = require.asset('./bin/llvm-objcopy.exe', __filename)
 exports['llvm-objdump'] = require.asset('./bin/llvm-objdump.exe', __filename)

@@ -3,7 +3,7 @@ include_guard()
 # Assembles the arguments for the LLVM sub-build. List valued arguments are
 # separated by `|`, which `ExternalProject_Add()` turns back into `;` by way of
 # its `LIST_SEPARATOR` option.
-function(llvm_args platform target result)
+function(llvm_args platform target libxml2 result)
   set(components
     clang
     clang-format
@@ -53,6 +53,7 @@ function(llvm_args platform target result)
       llvm-dlltool
       llvm-ml
       llvm-ml64
+      llvm-mt
       llvm-windres
     )
   endif()
@@ -64,11 +65,6 @@ function(llvm_args platform target result)
     -DLLVM_ENABLE_CURL=OFF
     -DLLVM_ENABLE_HTTPLIB=OFF
     -DLLVM_ENABLE_LIBEDIT=OFF
-
-    # Left off rather than auto detected: it decides whether `llvm-mt` exists at
-    # all, so detecting it would make the set of tools we ship depend on what
-    # happens to be installed on the build machine.
-    -DLLVM_ENABLE_LIBXML2=OFF
     -DLLVM_ENABLE_LIBPFM=OFF
     -DLLVM_ENABLE_PLUGINS=OFF
     -DLLVM_ENABLE_TERMINFO=OFF
@@ -84,6 +80,26 @@ function(llvm_args platform target result)
     # every invocation having to pass `-resource-dir`.
     -DCLANG_CONFIG_FILE_SYSTEM_DIR=../etc/clang
   )
+
+  # CMake drives the manifest tool itself when linking for an MSVC target, so
+  # `llvm-mt` is not optional there. It only exists when LLVM finds libxml2,
+  # which is built alongside us rather than detected so that the tool set does
+  # not depend on what the build machine happens to have. `FORCE_ON` turns a
+  # missing one into a configure failure rather than a silently absent tool.
+  if(platform STREQUAL "win32")
+    # `FindLibXml2` searches for `xml2` and `libxml2`, and a static MSVC release
+    # build is neither: libxml2 appends an `s`. The definition normally arrives
+    # from pkg-config, and without it the headers declare every symbol
+    # `dllimport` and the link against the static library fails.
+    list(APPEND args
+      -DLLVM_ENABLE_LIBXML2=FORCE_ON
+      "-DLIBXML2_INCLUDE_DIR=${libxml2}/include/libxml2"
+      "-DLIBXML2_LIBRARY=${libxml2}/lib/libxml2s.lib"
+      -DLIBXML2_DEFINITIONS=-DLIBXML_STATIC
+    )
+  else()
+    list(APPEND args -DLLVM_ENABLE_LIBXML2=OFF)
+  endif()
 
   if(LLVM_RUNTIME_SHARED)
     list(APPEND args
