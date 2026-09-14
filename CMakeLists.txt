@@ -11,6 +11,8 @@ include(cmake/llvm-args.cmake)
 
 set(LLVM_RUNTIME_VERSION "22.1.8" CACHE STRING "The LLVM release to build")
 
+set(LLVM_RUNTIME_LIBXML2_VERSION "2.15.4" CACHE STRING "The libxml2 release to build for the manifest tool")
+
 set(LLVM_RUNTIME_BACKENDS "AArch64;ARM;RISCV;WebAssembly;X86" CACHE STRING "The LLVM backends to build")
 
 option(LLVM_RUNTIME_SHARED "Build LLVM as a shared library" ON)
@@ -34,7 +36,62 @@ fetch_package(
   PATCHES patches/llvm-orc-backtrace-tools-export.patch
 )
 
-llvm_args("${platform}" "${target}" args)
+set(libxml2 "${CMAKE_CURRENT_BINARY_DIR}/libxml2")
+
+set(libxml2_library "${CMAKE_CURRENT_BINARY_DIR}/libxml2-library/xml2${CMAKE_IMPORT_LIBRARY_SUFFIX}")
+
+set(dependencies)
+
+if(platform STREQUAL "win32")
+  fetch_package(
+    "github:GNOME/libxml2#v${LLVM_RUNTIME_LIBXML2_VERSION}"
+    SOURCE_DIR libxml2_source
+    SOURCE_SUBDIR fetch-only
+  )
+
+  set(libxml2_args
+    "-DCMAKE_INSTALL_PREFIX=${libxml2}"
+    "-DCMAKE_BUILD_TYPE=Release"
+    "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+    -DBUILD_SHARED_LIBS=ON
+
+    -DLIBXML2_WITH_ICONV=OFF
+    -DLIBXML2_WITH_MODULES=OFF
+    -DLIBXML2_WITH_PROGRAMS=OFF
+    -DLIBXML2_WITH_PYTHON=OFF
+    -DLIBXML2_WITH_TESTS=OFF
+  )
+
+  if(CMAKE_TOOLCHAIN_FILE)
+    list(APPEND libxml2_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+  endif()
+
+  ExternalProject_Add(
+    libxml2
+    SOURCE_DIR "${libxml2_source}"
+    BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/libxml2-build"
+    DOWNLOAD_COMMAND ""
+    UPDATE_COMMAND ""
+    CMAKE_ARGS ${libxml2_args}
+    INSTALL_COMMAND
+      ${CMAKE_COMMAND} -E rm -rf "${libxml2}"
+    COMMAND
+      ${CMAKE_COMMAND} --build <BINARY_DIR> --target install
+    COMMAND
+      ${CMAKE_COMMAND}
+        -D "directory=${libxml2}/lib"
+        -D "pattern=*xml2*${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+        -D "destination=${libxml2_library}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/copy-library.cmake"
+    USES_TERMINAL_CONFIGURE ON
+    USES_TERMINAL_BUILD ON
+    USES_TERMINAL_INSTALL ON
+  )
+
+  list(APPEND dependencies libxml2)
+endif()
+
+llvm_args("${platform}" "${target}" "${libxml2}" "${libxml2_library}" args)
 
 list(APPEND args
   "-DCMAKE_INSTALL_PREFIX=${stage}"
@@ -84,6 +141,7 @@ endif()
 
 ExternalProject_Add(
   llvm
+  DEPENDS ${dependencies}
   SOURCE_DIR "${source}/llvm"
   BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/llvm"
   DOWNLOAD_COMMAND ""
@@ -121,11 +179,14 @@ list(JOIN linkers "|" linkers)
 
 set(linkers "/(${linkers})(\\.exe)?$")
 
+set(scripts "/git-clang-format(\\.bat)?$")
+
 install(
   DIRECTORY "${stage}/bin/"
   DESTINATION "clang-${target}/bin"
   USE_SOURCE_PERMISSIONS
   REGEX "${linkers}" EXCLUDE
+  REGEX "${scripts}" EXCLUDE
 )
 
 install(
@@ -144,6 +205,16 @@ install(
   FILES_MATCHING
     REGEX "${linkers}"
 )
+
+if(platform STREQUAL "win32")
+  install(
+    DIRECTORY "${libxml2}/bin/"
+    DESTINATION "clang-${target}/bin"
+    USE_SOURCE_PERMISSIONS
+    FILES_MATCHING
+      PATTERN "*.dll"
+  )
+endif()
 
 if(LLVM_RUNTIME_SHARED AND platform STREQUAL "win32")
   install(
