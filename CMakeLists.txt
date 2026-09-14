@@ -121,11 +121,14 @@ list(JOIN linkers "|" linkers)
 
 set(linkers "/(${linkers})(\\.exe)?$")
 
+set(scripts "/git-clang-format(\\.bat)?$")
+
 install(
   DIRECTORY "${stage}/bin/"
   DESTINATION "clang-${target}/bin"
   USE_SOURCE_PERMISSIONS
   REGEX "${linkers}" EXCLUDE
+  REGEX "${scripts}" EXCLUDE
 )
 
 install(
