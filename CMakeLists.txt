@@ -38,6 +38,8 @@ fetch_package(
 
 set(libxml2 "${CMAKE_CURRENT_BINARY_DIR}/libxml2")
 
+set(libxml2_library "${CMAKE_CURRENT_BINARY_DIR}/libxml2-library/xml2${CMAKE_IMPORT_LIBRARY_SUFFIX}")
+
 set(dependencies)
 
 if(platform STREQUAL "win32")
@@ -71,6 +73,16 @@ if(platform STREQUAL "win32")
     DOWNLOAD_COMMAND ""
     UPDATE_COMMAND ""
     CMAKE_ARGS ${libxml2_args}
+    INSTALL_COMMAND
+      ${CMAKE_COMMAND} -E rm -rf "${libxml2}"
+    COMMAND
+      ${CMAKE_COMMAND} --build <BINARY_DIR> --target install
+    COMMAND
+      ${CMAKE_COMMAND}
+        -D "directory=${libxml2}/lib"
+        -D "pattern=*xml2*${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+        -D "destination=${libxml2_library}"
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/copy-library.cmake"
     USES_TERMINAL_CONFIGURE ON
     USES_TERMINAL_BUILD ON
     USES_TERMINAL_INSTALL ON
@@ -79,7 +91,7 @@ if(platform STREQUAL "win32")
   list(APPEND dependencies libxml2)
 endif()
 
-llvm_args("${platform}" "${target}" "${libxml2}" args)
+llvm_args("${platform}" "${target}" "${libxml2}" "${libxml2_library}" args)
 
 list(APPEND args
   "-DCMAKE_INSTALL_PREFIX=${stage}"

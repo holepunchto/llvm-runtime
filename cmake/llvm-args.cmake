@@ -3,7 +3,7 @@ include_guard()
 # Assembles the arguments for the LLVM sub-build. List valued arguments are
 # separated by `|`, which `ExternalProject_Add()` turns back into `;` by way of
 # its `LIST_SEPARATOR` option.
-function(llvm_args platform target libxml2 result)
+function(llvm_args platform target libxml2 libxml2_library result)
   set(components
     clang
     clang-format
@@ -88,14 +88,15 @@ function(llvm_args platform target libxml2 result)
   # not depend on what the build machine happens to have. `FORCE_ON` turns a
   # missing one into a configure failure rather than a silently absent tool.
   if(platform STREQUAL "win32")
-    # libxml2 is a DLL rather than a static library because `FindLibXml2`
-    # describes it with a path alone. A static one on Windows also needs
-    # `bcrypt`, which is a usage requirement the imported target cannot carry,
-    # and names its release build `libxml2s`, which is not among the names the
-    # module looks for.
+    # libxml2 is a DLL rather than a static library: a static one on Windows
+    # needs `bcrypt`, and that is a usage requirement `FindLibXml2` cannot
+    # carry, describing a library by path alone. The path is one we copied the
+    # build's output to, so neither of us has to agree with the other on how
+    # libxml2 spells it.
     list(APPEND args
       -DLLVM_ENABLE_LIBXML2=FORCE_ON
-      "-DCMAKE_PREFIX_PATH=${libxml2}"
+      "-DLIBXML2_INCLUDE_DIR=${libxml2}/include/libxml2"
+      "-DLIBXML2_LIBRARY=${libxml2_library}"
     )
   else()
     list(APPEND args -DLLVM_ENABLE_LIBXML2=OFF)
