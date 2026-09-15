@@ -36,12 +36,17 @@ function(llvm_args platform target libxml2 libxml2_library result)
   # list above, and an alias installs as a copy rather than a symlink, so
   # shipping them everywhere would not be free.
   if(platform STREQUAL "darwin")
+    # Apple's linker is the one linker we do not ship, and it loads LTO support
+    # from a library rather than carrying it, so the driver names the path it
+    # expects on every link whether or not the link uses LTO. lld needs no such
+    # library, having linked LLVM already.
     list(APPEND components
       dsymutil
       llvm-install-name-tool
       llvm-libtool-darwin
       llvm-lipo
       llvm-otool
+      LTO
     )
   elseif(platform STREQUAL "linux")
     list(APPEND components
