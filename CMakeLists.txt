@@ -211,6 +211,27 @@ install(
     PATTERN "clang" EXCLUDE
 )
 
+# The linker and the resource directory each ship in a package of their own, so
+# neither sits where a driver looks by default. A driver reads the configuration
+# file named after it ahead of its command line, which names both without every
+# invocation having to. `<CFGDIR>` expands to the directory the file was read
+# from, and npm resolves all three packages from the same parent, which is three
+# levels above it whether they are hoisted or nested.
+set(config "${CMAKE_CURRENT_BINARY_DIR}/config/driver.cfg")
+
+file(WRITE "${config}"
+  "-B<CFGDIR>/../../../llvm-runtime-lld-${target}/bin\n"
+  "-resource-dir=<CFGDIR>/../../../llvm-runtime-resources-${platform}\n"
+)
+
+foreach(driver clang clang++ clang-cl clang-cpp)
+  install(
+    FILES "${config}"
+    DESTINATION "clang-${target}/etc/clang"
+    RENAME "${driver}.cfg"
+  )
+endforeach()
+
 install(
   DIRECTORY "${stage}/bin/"
   DESTINATION "lld-${target}/bin"

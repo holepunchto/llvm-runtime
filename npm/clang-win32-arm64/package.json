@@ -32,10 +32,12 @@
   "files": [
     "NOTICE",
     "index.js",
-    "bin"
+    "bin",
+    "etc"
   ],
   "assets": [
-    "bin"
+    "bin",
+    "etc"
   ],
   "repository": {
     "type": "git",
