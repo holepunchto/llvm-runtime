@@ -33,10 +33,12 @@
     "NOTICE",
     "index.js",
     "bin",
+    "etc",
     "lib"
   ],
   "assets": [
     "bin",
+    "etc",
     "lib"
   ],
   "repository": {
