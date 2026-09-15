@@ -134,9 +134,22 @@ else()
     message(FATAL_ERROR "No toolchain file for the build host at '${host_toolchain}'")
   endif()
 
-  list(APPEND args
-    "-DCROSS_TOOLCHAIN_FLAGS_NATIVE=-DCMAKE_TOOLCHAIN_FILE=${host_toolchain}|-DCMAKE_CROSSCOMPILING=FALSE|-DCMAKE_BUILD_TYPE=Release|-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+  # The tools that have to run on the build host are configured separately and
+  # inherit nothing, so anything the host needs is repeated here.
+  set(native_args
+    "-DCMAKE_TOOLCHAIN_FILE=${host_toolchain}"
+    -DCMAKE_CROSSCOMPILING=FALSE
+    -DCMAKE_BUILD_TYPE=Release
+    "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
   )
+
+  if(platform STREQUAL "win32")
+    list(APPEND native_args -DLLVM_DISABLE_ASSEMBLY_FILES=ON)
+  endif()
+
+  list(JOIN native_args "|" native_args)
+
+  list(APPEND args "-DCROSS_TOOLCHAIN_FLAGS_NATIVE=${native_args}")
 endif()
 
 ExternalProject_Add(

@@ -16,11 +16,11 @@ jobs:
           - os: ubuntu-22.04-arm
             platform: linux
             arch: arm64
-          - os: macos-14
+          - os: macos-15
             platform: darwin
             arch: arm64
             flags: -D LLVM_RUNTIME_RESOURCES=ON
-          - os: macos-14
+          - os: macos-15
             platform: darwin
             arch: x64
           - os: windows-2022
