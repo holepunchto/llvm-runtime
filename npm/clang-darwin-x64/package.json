@@ -41,6 +41,9 @@
     "etc",
     "lib"
   ],
+  "scripts": {
+    "prepack": "node ../../prepack.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/holepunchto/llvm-runtime.git"

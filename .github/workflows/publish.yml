@@ -62,6 +62,7 @@ jobs:
       - uses: holepunchto/actions/download-prebuilds@v1
         with:
           prefix: npm
+      - run: npm run prepack --workspaces
       - uses: holepunchto/actions/publish@v1
         with:
           workspaces: true
