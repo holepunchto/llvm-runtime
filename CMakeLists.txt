@@ -13,7 +13,7 @@ set(LLVM_RUNTIME_VERSION "22.1.8" CACHE STRING "The LLVM release to build")
 
 set(LLVM_RUNTIME_LIBXML2_VERSION "2.15.4" CACHE STRING "The libxml2 release to build for the manifest tool")
 
-set(LLVM_RUNTIME_BACKENDS "AArch64;ARM;RISCV;WebAssembly;X86" CACHE STRING "The LLVM backends to build")
+set(LLVM_RUNTIME_BACKENDS "AArch64;ARM;Mips;RISCV;WebAssembly;X86" CACHE STRING "The LLVM backends to build")
 
 option(LLVM_RUNTIME_SHARED "Build LLVM as a shared library" ON)
 
