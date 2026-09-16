@@ -81,3 +81,14 @@ foreach(target IN LISTS targets)
     set(RUNTIMES_${target}_COMPILER_RT_BUILD_SANITIZERS OFF CACHE BOOL "")
   endif()
 endforeach()
+
+# compiler-rt's Arm sources are written for Armv7-A, its atomic routines
+# reaching for `dmb` and `ldrexd`, and the architecture the sources are chosen
+# by follows from the triple alone. `arm-linux-gnueabi` leaves clang defaulting
+# to Armv4T, so the architecture is raised to meet them rather than the sources
+# lowered.
+foreach(prefix IN ITEMS BUILTINS RUNTIMES)
+  foreach(language IN ITEMS ASM C CXX)
+    set(${prefix}_arm-linux-gnueabi_CMAKE_${language}_FLAGS "-march=armv7-a" CACHE STRING "")
+  endforeach()
+endforeach()
