@@ -36,6 +36,7 @@ fetch_package(
   PATCHES
     patches/llvm-vplan-evl-recipes-export.patch
     patches/llvm-dtlto-extract-inputs-export.patch
+    patches/llvm-dtlto-background-deletion-export.patch
     patches/llvm-instrumentor-vfs-include.patch
 )
 

@@ -118,6 +118,18 @@ function(llvm_args platform target libxml2 libxml2_library result)
     list(APPEND args -DLLVM_ENABLE_LIBXML2=OFF)
   endif()
 
+  # LLVM shares one precompiled header between a library and its dependents,
+  # and the library it comes from is part of the shared library, so the header
+  # is compiled with `LLVM_EXPORTS` and every `LLVM_ABI` declaration in it is
+  # baked as `dllexport`. A dependent that is not part of the shared library,
+  # such as lld, compiles without that definition and should see `dllimport`,
+  # but the header it is handed says otherwise. References to functions still
+  # reach the import library through its thunks; references to data have no
+  # thunk to reach and go unresolved at link time.
+  if(platform STREQUAL "win32")
+    list(APPEND args -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON)
+  endif()
+
   # BLAKE3 carries four MASM sources that LLVM assembles with `ml64` on x86-64
   # MSVC, which exists only inside a developer command prompt. Building this
   # package cannot depend on one, and the fallback is the portable C that the
