@@ -13,7 +13,7 @@ set(LLVM_RUNTIME_VERSION "22.1.8" CACHE STRING "The LLVM release to build")
 
 set(LLVM_RUNTIME_LIBXML2_VERSION "2.15.4" CACHE STRING "The libxml2 release to build for the manifest tool")
 
-set(LLVM_RUNTIME_BACKENDS "AArch64;ARM;RISCV;WebAssembly;X86" CACHE STRING "The LLVM backends to build")
+set(LLVM_RUNTIME_BACKENDS "AArch64;ARM;Mips;RISCV;WebAssembly;X86" CACHE STRING "The LLVM backends to build")
 
 option(LLVM_RUNTIME_SHARED "Build LLVM as a shared library" ON)
 
@@ -106,6 +106,9 @@ endif()
 set(build_targets distribution)
 set(install_targets install-distribution)
 
+set(runtime_build_targets)
+set(runtime_install_targets)
+
 if(LLVM_RUNTIME_RESOURCES)
   set(cache "${CMAKE_CURRENT_SOURCE_DIR}/cmake/resources/${platform}.cmake")
 
@@ -117,8 +120,8 @@ if(LLVM_RUNTIME_RESOURCES)
 
   list(APPEND args -DLLVM_ENABLE_RUNTIMES=compiler-rt -DCOMPILER_RT_BUILD_BUILTINS=OFF)
 
-  list(APPEND build_targets builtins runtimes)
-  list(APPEND install_targets install-builtins install-runtimes)
+  set(runtime_build_targets builtins runtimes)
+  set(runtime_install_targets install-builtins install-runtimes)
 else()
   list(APPEND args -DLLVM_ENABLE_RUNTIMES=)
 endif()
@@ -152,6 +155,19 @@ else()
   list(APPEND args "-DCROSS_TOOLCHAIN_FLAGS_NATIVE=${native_args}")
 endif()
 
+set(build_command ${CMAKE_COMMAND} --build <BINARY_DIR> --target ${build_targets})
+set(install_command ${CMAKE_COMMAND} --build <BINARY_DIR> --target ${install_targets})
+
+if(runtime_build_targets)
+  list(APPEND build_command
+    COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --target ${runtime_build_targets}
+  )
+
+  list(APPEND install_command
+    COMMAND ${CMAKE_COMMAND} --build <BINARY_DIR> --target ${runtime_install_targets}
+  )
+endif()
+
 ExternalProject_Add(
   llvm
   DEPENDS ${dependencies}
@@ -161,10 +177,8 @@ ExternalProject_Add(
   UPDATE_COMMAND ""
   LIST_SEPARATOR "|"
   CMAKE_ARGS ${args}
-  BUILD_COMMAND
-    ${CMAKE_COMMAND} --build <BINARY_DIR> --target ${build_targets}
-  INSTALL_COMMAND
-    ${CMAKE_COMMAND} --build <BINARY_DIR> --target ${install_targets}
+  BUILD_COMMAND ${build_command}
+  INSTALL_COMMAND ${install_command}
   COMMAND
     ${CMAKE_COMMAND}
       -D "directory=${stage}/lib"
