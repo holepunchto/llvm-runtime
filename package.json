@@ -1,6 +1,6 @@
 {
   "name": "llvm-runtime",
-  "version": "22.1.8",
+  "version": "23.1.0",
   "description": "Prebuilt LLVM toolchains for macOS, Linux, and Windows",
   "exports": {
     ".": "./index.js",
@@ -101,21 +101,21 @@
     "bare-subprocess": "^6.1.0"
   },
   "optionalDependencies": {
-    "llvm-runtime-clang-darwin-arm64": "22.1.8",
-    "llvm-runtime-clang-darwin-x64": "22.1.8",
-    "llvm-runtime-clang-linux-arm64": "22.1.8",
-    "llvm-runtime-clang-linux-x64": "22.1.8",
-    "llvm-runtime-clang-win32-arm64": "22.1.8",
-    "llvm-runtime-clang-win32-x64": "22.1.8",
-    "llvm-runtime-lld-darwin-arm64": "22.1.8",
-    "llvm-runtime-lld-darwin-x64": "22.1.8",
-    "llvm-runtime-lld-linux-arm64": "22.1.8",
-    "llvm-runtime-lld-linux-x64": "22.1.8",
-    "llvm-runtime-lld-win32-arm64": "22.1.8",
-    "llvm-runtime-lld-win32-x64": "22.1.8",
-    "llvm-runtime-resources-darwin": "22.1.8",
-    "llvm-runtime-resources-linux": "22.1.8",
-    "llvm-runtime-resources-win32": "22.1.8"
+    "llvm-runtime-clang-darwin-arm64": "23.1.0",
+    "llvm-runtime-clang-darwin-x64": "23.1.0",
+    "llvm-runtime-clang-linux-arm64": "23.1.0",
+    "llvm-runtime-clang-linux-x64": "23.1.0",
+    "llvm-runtime-clang-win32-arm64": "23.1.0",
+    "llvm-runtime-clang-win32-x64": "23.1.0",
+    "llvm-runtime-lld-darwin-arm64": "23.1.0",
+    "llvm-runtime-lld-darwin-x64": "23.1.0",
+    "llvm-runtime-lld-linux-arm64": "23.1.0",
+    "llvm-runtime-lld-linux-x64": "23.1.0",
+    "llvm-runtime-lld-win32-arm64": "23.1.0",
+    "llvm-runtime-lld-win32-x64": "23.1.0",
+    "llvm-runtime-resources-darwin": "23.1.0",
+    "llvm-runtime-resources-linux": "23.1.0",
+    "llvm-runtime-resources-win32": "23.1.0"
   },
   "devDependencies": {
     "cmake-bare": "^1.9.0",

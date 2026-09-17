@@ -9,7 +9,7 @@ include(ExternalProject)
 
 include(cmake/llvm-args.cmake)
 
-set(LLVM_RUNTIME_VERSION "22.1.8" CACHE STRING "The LLVM release to build")
+set(LLVM_RUNTIME_VERSION "23.1.0" CACHE STRING "The LLVM release to build")
 
 set(LLVM_RUNTIME_LIBXML2_VERSION "2.15.4" CACHE STRING "The libxml2 release to build for the manifest tool")
 
@@ -33,7 +33,6 @@ fetch_package(
   "github:llvm/llvm-project#llvmorg-${LLVM_RUNTIME_VERSION}"
   SOURCE_DIR source
   SOURCE_SUBDIR fetch-only
-  PATCHES patches/llvm-orc-backtrace-tools-export.patch
 )
 
 set(libxml2 "${CMAKE_CURRENT_BINARY_DIR}/libxml2")

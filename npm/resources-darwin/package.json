@@ -1,6 +1,6 @@
 {
   "name": "llvm-runtime-resources-darwin",
-  "version": "22.1.8",
+  "version": "23.1.0",
   "description": "The compiler runtime libraries for Apple platforms",
   "exports": {
     ".": "./index.js",

@@ -1,6 +1,6 @@
 {
   "name": "llvm-runtime-lld-linux-x64",
-  "version": "22.1.8",
+  "version": "23.1.0",
   "description": "The Linux Intel 64-bit binaries for the LLVM linker",
   "exports": {
     ".": "./index.js",
@@ -41,7 +41,7 @@
     "x64"
   ],
   "dependencies": {
-    "llvm-runtime-clang-linux-x64": "22.1.8",
+    "llvm-runtime-clang-linux-x64": "23.1.0",
     "require-asset": "^1.2.3"
   }
 }
