@@ -33,6 +33,9 @@ fetch_package(
   "github:llvm/llvm-project#llvmorg-${LLVM_RUNTIME_VERSION}"
   SOURCE_DIR source
   SOURCE_SUBDIR fetch-only
+  PATCHES
+    patches/llvm-vplan-evl-recipes-export.patch
+    patches/llvm-dtlto-extract-inputs-export.patch
 )
 
 set(libxml2 "${CMAKE_CURRENT_BINARY_DIR}/libxml2")
