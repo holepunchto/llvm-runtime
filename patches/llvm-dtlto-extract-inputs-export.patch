@@ -1,0 +1,17 @@
+`LLVM_ABI` expands to `__declspec(dllexport)` on Windows, which clang-cl
+rejects on a member function of a class that is already dllexport. The class
+carries the annotation, so the one on the member is redundant.
+
+Still present upstream as of 23.1.0.
+
+--- a/llvm/include/llvm/DTLTO/DTLTO.h
++++ b/llvm/include/llvm/DTLTO/DTLTO.h
+@@ -113,7 +113,7 @@
+   /// but before optimization begins. Existing files are overwritten because
+   /// they are likely leftovers from a previously terminated linker process and
+   /// can be safely replaced.
+-  LLVM_ABI Error extractLTOInputs();
++  Error extractLTOInputs();
+ 
+   // Remove temporary files created to enable distribution.
+   void cleanup() override;

@@ -1,6 +1,6 @@
 {
   "name": "llvm-runtime-lld-win32-arm64",
-  "version": "22.1.8",
+  "version": "23.1.0",
   "description": "The Windows ARM 64-bit binaries for the LLVM linker",
   "exports": {
     ".": "./index.js",

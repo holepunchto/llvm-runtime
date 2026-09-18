@@ -1,0 +1,17 @@
+A `dllexport` function has its default arguments instantiated where it is
+declared, so the one here needs `vfs::FileSystem` to be complete rather than
+merely declared. The header never includes it, and the compile only works
+when something else happens to have included it first.
+
+Still present upstream as of 23.1.0.
+
+--- a/llvm/include/llvm/Transforms/IPO/Instrumentor.h
++++ b/llvm/include/llvm/Transforms/IPO/Instrumentor.h
+@@ -31,6 +31,7 @@
+ #include "llvm/Support/Allocator.h"
+ #include "llvm/Support/ErrorHandling.h"
+ #include "llvm/Support/StringSaver.h"
++#include "llvm/Support/VirtualFileSystem.h"
+ #include "llvm/Transforms/IPO/InstrumentorUtils.h"
+ #include "llvm/Transforms/Utils/Instrumentation.h"
+ 

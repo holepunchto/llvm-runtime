@@ -1,6 +1,6 @@
 {
   "name": "llvm-runtime-clang-darwin-arm64",
-  "version": "22.1.8",
+  "version": "23.1.0",
   "description": "The macOS ARM 64-bit binaries for the LLVM compiler",
   "exports": {
     ".": "./index.js",

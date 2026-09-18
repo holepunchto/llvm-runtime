@@ -1,0 +1,21 @@
+A dll attribute does not reach a nested class, so neither of these is
+exported from the shared library although the class around them is. The
+constructor of `DTLTO` is defined inline and the destructor is implicit, and
+`/Zc:dllexportInlines-` leaves both to be emitted by whoever uses them, so a
+linker built against the shared library needs the two of them by name.
+
+Still present upstream as of 23.1.0.
+
+--- a/llvm/include/llvm/DTLTO/DTLTO.h
++++ b/llvm/include/llvm/DTLTO/DTLTO.h
+@@ -367,8 +367,8 @@
+   // There can be many temporary files to remove. Performing deletion in the
+   // background can save a few seconds on Windows hosts.
+   struct BackgroundDeletion : DefaultThreadPool {
+-    BackgroundDeletion();
+-    ~BackgroundDeletion();
++    LLVM_ABI BackgroundDeletion();
++    LLVM_ABI ~BackgroundDeletion();
+ 
+     void removeFiles(std::vector<std::string> &&Files, const Config &Conf);
+     void waitForTasks();
