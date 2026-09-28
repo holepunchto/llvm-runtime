@@ -242,13 +242,26 @@ file(WRITE "${config}"
   "-resource-dir=<CFGDIR>/../../../llvm-runtime-resources-${platform}\n"
 )
 
-foreach(driver clang clang++ clang-cl clang-cpp)
+set(config_cl "${CMAKE_CURRENT_BINARY_DIR}/config/driver-cl.cfg")
+
+file(WRITE "${config_cl}"
+  "/clang:-B<CFGDIR>/../../../llvm-runtime-lld-${target}/bin\n"
+  "-resource-dir=<CFGDIR>/../../../llvm-runtime-resources-${platform}\n"
+)
+
+foreach(driver clang clang++ clang-cpp)
   install(
     FILES "${config}"
     DESTINATION "clang-${target}/etc/clang"
     RENAME "${driver}.cfg"
   )
 endforeach()
+
+install(
+  FILES "${config_cl}"
+  DESTINATION "clang-${target}/etc/clang"
+  RENAME "clang-cl.cfg"
+)
 
 install(
   DIRECTORY "${stage}/bin/"
