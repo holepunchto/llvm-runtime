@@ -9,7 +9,7 @@ include(ExternalProject)
 
 include(cmake/llvm-args.cmake)
 
-set(LLVM_RUNTIME_VERSION "23.1.0" CACHE STRING "The LLVM release to build")
+set(LLVM_RUNTIME_VERSION "23.1.1" CACHE STRING "The LLVM release to build")
 
 set(LLVM_RUNTIME_LIBXML2_VERSION "2.15.4" CACHE STRING "The libxml2 release to build for the manifest tool")
 

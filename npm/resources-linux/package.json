@@ -1,6 +1,6 @@
 {
   "name": "llvm-runtime-resources-linux",
-  "version": "23.1.0",
+  "version": "23.1.1",
   "description": "The compiler runtime libraries for Linux",
   "exports": {
     ".": "./index.js",
