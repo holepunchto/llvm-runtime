@@ -37,6 +37,7 @@ set(instrumented
 include("${CMAKE_CURRENT_LIST_DIR}/wasi.cmake")
 
 set(LLVM_BUILTIN_TARGETS ${targets} ${wasi_targets} CACHE STRING "")
+set(LLVM_RUNTIME_TARGETS ${targets} CACHE STRING "")
 
 # `llvm_ExternalProject_Add()` hands a sub-build the compiler it just built only
 # when it decides the outer build is not itself cross compiling, and leaves the
