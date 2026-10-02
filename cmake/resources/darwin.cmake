@@ -6,6 +6,10 @@
 # separate runtime targets. `llvm/runtimes/CMakeLists.txt` rejects a Darwin
 # triple in `LLVM_RUNTIME_TARGETS` for this reason.
 
+include("${CMAKE_CURRENT_LIST_DIR}/wasi.cmake")
+
+set(LLVM_BUILTIN_TARGETS default ${wasi_targets} CACHE STRING "")
+
 set(COMPILER_RT_ENABLE_IOS ON CACHE BOOL "")
 set(COMPILER_RT_ENABLE_TVOS OFF CACHE BOOL "")
 set(COMPILER_RT_ENABLE_WATCHOS OFF CACHE BOOL "")
