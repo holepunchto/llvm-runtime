@@ -34,7 +34,9 @@ set(instrumented
   x86_64-linux-gnu
 )
 
-set(LLVM_BUILTIN_TARGETS ${targets} CACHE STRING "")
+include("${CMAKE_CURRENT_LIST_DIR}/wasi.cmake")
+
+set(LLVM_BUILTIN_TARGETS ${targets} ${wasi_targets} CACHE STRING "")
 set(LLVM_RUNTIME_TARGETS ${targets} CACHE STRING "")
 
 # `llvm_ExternalProject_Add()` hands a sub-build the compiler it just built only
