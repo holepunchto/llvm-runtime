@@ -7,10 +7,11 @@
 # `--target=` it was given to, and a triple we never spell is a directory
 # nothing ever finds.
 #
-# Cross compiling these needs each architecture's headers and libraries on the
-# build host, which the GCC cross toolchains provide and the driver locates on
-# its own. Nothing here names a sysroot; installing `gcc-<triple>` and
-# `g++-<triple>` is what makes a target buildable.
+# Cross compiling the glibc targets needs each architecture's headers and
+# libraries on the build host, which the GCC cross toolchains provide and the
+# driver locates on its own. Installing `gcc-<triple>` and `g++-<triple>` is
+# what makes one of them buildable. The musl targets instead name a sysroot of
+# musl headers, which the outer build installs for them.
 
 set(targets
   aarch64-linux-gnu
@@ -20,6 +21,17 @@ set(targets
   mipsel-linux-gnu
   riscv64-linux-gnu
   x86_64-linux-gnu
+)
+
+set(musl_targets
+  aarch64-linux-musl
+  arm-linux-musleabi
+  i386-linux-musl
+  mips-linux-musl
+  mips-linux-muslsf
+  mipsel-linux-musl
+  mipsel-linux-muslsf
+  x86_64-linux-musl
 )
 
 # The builtins and the profile runtime cover every architecture compiler-rt
@@ -36,8 +48,8 @@ set(instrumented
 
 include("${CMAKE_CURRENT_LIST_DIR}/wasi.cmake")
 
-set(LLVM_BUILTIN_TARGETS ${targets} ${wasi_targets} CACHE STRING "")
-set(LLVM_RUNTIME_TARGETS ${targets} CACHE STRING "")
+set(LLVM_BUILTIN_TARGETS ${targets} ${musl_targets} ${wasi_targets} CACHE STRING "")
+set(LLVM_RUNTIME_TARGETS ${targets} ${musl_targets} CACHE STRING "")
 
 # `llvm_ExternalProject_Add()` hands a sub-build the compiler it just built only
 # when it decides the outer build is not itself cross compiling, and leaves the
@@ -50,7 +62,7 @@ set(LLVM_RUNTIME_TARGETS ${targets} CACHE STRING "")
 # that build's directory and the tools land beneath it.
 set(toolchain "${CMAKE_BINARY_DIR}/bin")
 
-foreach(target IN LISTS targets)
+foreach(target IN LISTS targets musl_targets)
   foreach(prefix IN ITEMS BUILTINS RUNTIMES)
     set(${prefix}_${target}_CMAKE_ASM_COMPILER "${toolchain}/clang" CACHE FILEPATH "")
     set(${prefix}_${target}_CMAKE_C_COMPILER "${toolchain}/clang" CACHE FILEPATH "")
@@ -84,13 +96,37 @@ foreach(target IN LISTS targets)
   endif()
 endforeach()
 
+# The musl headers are installed once per architecture that musl knows, which
+# covers both MIPS byte orders and both float ABIs, as those follow from the
+# compiler rather than from the headers.
+#
+# With headers and no libc, nothing links, so the runtimes probe the target by
+# compiling alone, as the builtins already do. Probes that link would all fail
+# and quietly leave out what they test for, such as the atomic counters of the
+# profile runtime.
+foreach(target IN LISTS musl_targets)
+  string(REGEX MATCH "^[^-]+" arch "${target}")
+
+  if(arch MATCHES "^mips")
+    set(arch mips)
+  endif()
+
+  foreach(prefix IN ITEMS BUILTINS RUNTIMES)
+    set(${prefix}_${target}_CMAKE_SYSROOT "${CMAKE_BINARY_DIR}/musl/${arch}" CACHE PATH "")
+  endforeach()
+
+  set(RUNTIMES_${target}_CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY CACHE STRING "")
+endforeach()
+
 # compiler-rt's Arm sources are written for Armv7-A, its atomic routines
 # reaching for `dmb` and `ldrexd`, and the architecture the sources are chosen
-# by follows from the triple alone. `arm-linux-gnueabi` leaves clang defaulting
-# to Armv4T, so the architecture is raised to meet them rather than the sources
-# lowered.
-foreach(prefix IN ITEMS BUILTINS RUNTIMES)
-  foreach(language IN ITEMS ASM C CXX)
-    set(${prefix}_arm-linux-gnueabi_CMAKE_${language}_FLAGS "-march=armv7-a" CACHE STRING "")
+# by follows from the triple alone. `arm-linux-gnueabi` and
+# `arm-linux-musleabi` leave clang defaulting to Armv4T, so the architecture is
+# raised to meet them rather than the sources lowered.
+foreach(target IN ITEMS arm-linux-gnueabi arm-linux-musleabi)
+  foreach(prefix IN ITEMS BUILTINS RUNTIMES)
+    foreach(language IN ITEMS ASM C CXX)
+      set(${prefix}_${target}_CMAKE_${language}_FLAGS "-march=armv7-a" CACHE STRING "")
+    endforeach()
   endforeach()
 endforeach()
