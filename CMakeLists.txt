@@ -13,6 +13,8 @@ set(LLVM_RUNTIME_VERSION "23.1.1" CACHE STRING "The LLVM release to build")
 
 set(LLVM_RUNTIME_LIBXML2_VERSION "2.15.4" CACHE STRING "The libxml2 release to build for the manifest tool")
 
+set(LLVM_RUNTIME_MUSL_VERSION "1.2.6" CACHE STRING "The musl release whose headers the compiler runtime libraries for musl are built against")
+
 set(LLVM_RUNTIME_BACKENDS "AArch64;ARM;Mips;RISCV;WebAssembly;X86" CACHE STRING "The LLVM backends to build")
 
 option(LLVM_RUNTIME_SHARED "Build LLVM as a shared library" ON)
@@ -93,6 +95,57 @@ if(platform STREQUAL "win32")
   )
 
   list(APPEND dependencies libxml2)
+endif()
+
+# The compiler runtime libraries for the musl targets only need the headers of
+# musl, which need no compiler to install. They are an input to the build and
+# are never installed themselves. They land in the LLVM build directory, which
+# is where the initial cache for Linux looks for them.
+#
+# Each architecture is installed from a directory of its own, as the headers
+# that musl generates per architecture are otherwise reused across all of them.
+if(LLVM_RUNTIME_RESOURCES AND platform STREQUAL "linux")
+  fetch_package(
+    "https://musl.libc.org/releases/musl-${LLVM_RUNTIME_MUSL_VERSION}.tar.gz"
+    SOURCE_DIR musl_source
+    SOURCE_SUBDIR fetch-only
+  )
+
+  find_program(make NAMES gmake make REQUIRED)
+
+  set(musl_headers "${CMAKE_CURRENT_BINARY_DIR}/llvm/musl")
+
+  set(musl_install_command)
+
+  foreach(arch IN ITEMS aarch64 arm i386 mips x86_64)
+    list(APPEND musl_install_command
+      COMMAND ${CMAKE_COMMAND} -E make_directory "<BINARY_DIR>/${arch}"
+      COMMAND
+        "${make}"
+          -C "<BINARY_DIR>/${arch}"
+          -f "${musl_source}/Makefile"
+          "srcdir=${musl_source}"
+          "ARCH=${arch}"
+          prefix=/
+          "DESTDIR=${musl_headers}/${arch}"
+          install-headers
+    )
+  endforeach()
+
+  list(POP_FRONT musl_install_command)
+
+  ExternalProject_Add(
+    musl
+    SOURCE_DIR "${musl_source}"
+    BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/musl-build"
+    DOWNLOAD_COMMAND ""
+    UPDATE_COMMAND ""
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ${musl_install_command}
+  )
+
+  list(APPEND dependencies musl)
 endif()
 
 llvm_args("${platform}" "${target}" "${libxml2}" "${libxml2_library}" args)
