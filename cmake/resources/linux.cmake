@@ -130,3 +130,13 @@ foreach(target IN ITEMS arm-linux-gnueabi arm-linux-musleabi)
     endforeach()
   endforeach()
 endforeach()
+
+# clang reads the floating point ABI from `-msoft-float` alone and not from the
+# `muslsf` environment, which would otherwise yield hard float runtimes.
+foreach(target IN ITEMS mips-linux-muslsf mipsel-linux-muslsf)
+  foreach(prefix IN ITEMS BUILTINS RUNTIMES)
+    foreach(language IN ITEMS ASM C CXX)
+      set(${prefix}_${target}_CMAKE_${language}_FLAGS "-msoft-float" CACHE STRING "")
+    endforeach()
+  endforeach()
+endforeach()
