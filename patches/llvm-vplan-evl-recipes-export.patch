@@ -2,7 +2,7 @@
 rejects on a member function of a class that is already dllexport. Both
 classes carry the annotation, so the ones on their members are redundant.
 
-Fixed upstream on main but not in 23.1.1; drop this patch once a release carries the fix.
+Fixed upstream on main but not in 23.1.2; drop this patch once a release carries the fix.
 
 --- a/llvm/lib/Transforms/Vectorize/VPlan.h
 +++ b/llvm/lib/Transforms/Vectorize/VPlan.h

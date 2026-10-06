@@ -2,7 +2,7 @@
 rejects on a member function of a class that is already dllexport. The class
 carries the annotation, so the one on the member is redundant.
 
-Still present upstream as of 23.1.1.
+Still present upstream as of 23.1.2.
 
 --- a/llvm/include/llvm/DTLTO/DTLTO.h
 +++ b/llvm/include/llvm/DTLTO/DTLTO.h
