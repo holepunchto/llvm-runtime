@@ -161,9 +161,16 @@ function(llvm_args platform target libxml2 libxml2_library result)
       # export annotations that LLVM's does, so nothing it declares reaches a
       # DLL's export table and the drivers cannot link against one. They link
       # clang statically and share LLVM alone.
+      #
+      # The tools and the DLL have to share one C runtime. With the static one
+      # each carries a copy of its own, and state such as the file descriptor
+      # table is not shared between them. `llvm-ar x`, for one, closes a file
+      # descriptor that the DLL opened, which its own copy of the runtime does
+      # not know of and terminates the process over.
       list(APPEND args
         -DLLVM_BUILD_LLVM_DYLIB_VIS=ON
         -DCLANG_LINK_CLANG_DYLIB=OFF
+        "-DCMAKE_PROJECT_INCLUDE=${CMAKE_CURRENT_FUNCTION_LIST_DIR}/msvc-shared-runtime.cmake"
       )
     else()
       list(APPEND args -DCLANG_LINK_CLANG_DYLIB=ON)

@@ -60,3 +60,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+---
+
+Microsoft Visual C++ Runtime
+
+The Visual C++ runtime libraries (vcruntime140*.dll, msvcp140*.dll, and
+concrt140.dll) are Copyright (C) Microsoft Corporation. All rights reserved.
+
+They are redistributed unmodified as Distributable Code under the Microsoft
+Software License Terms for Microsoft Visual Studio, which govern their use. See
+https://visualstudio.microsoft.com/license-terms/ and
+https://learn.microsoft.com/cpp/windows/redistributing-visual-cpp-files.

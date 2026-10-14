@@ -72,6 +72,11 @@ if(platform STREQUAL "win32")
     list(APPEND libxml2_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
   endif()
 
+  # libxml2 is linked into the LLVM DLL, so it has to use the same C runtime.
+  if(LLVM_RUNTIME_SHARED)
+    list(APPEND libxml2_args "-DCMAKE_PROJECT_INCLUDE=${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc-shared-runtime.cmake")
+  endif()
+
   ExternalProject_Add(
     libxml2
     SOURCE_DIR "${libxml2_source}"
@@ -332,6 +337,25 @@ if(LLVM_RUNTIME_SHARED AND platform STREQUAL "win32")
     FILES_MATCHING
       REGEX "/(lib)?LLVM(-[0-9.]+)?\\.dll$"
   )
+
+  # The shared C runtime is not part of Windows, so a copy of it is placed
+  # beside every copy of the LLVM DLL rather than relying on the Visual C++
+  # Redistributable being installed. The Universal CRT it builds on is part of
+  # Windows 10 and later.
+  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+
+  include(InstallRequiredSystemLibraries)
+
+  if(NOT CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+    message(FATAL_ERROR "Cannot find the Visual C++ runtime libraries to ship with the LLVM DLL")
+  endif()
+
+  foreach(package IN ITEMS clang lld)
+    install(
+      PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+      DESTINATION "${package}-${target}/bin"
+    )
+  endforeach()
 endif()
 
 if(LLVM_RUNTIME_RESOURCES)
