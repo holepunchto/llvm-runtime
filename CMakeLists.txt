@@ -31,6 +31,19 @@ set(stage "${CMAKE_CURRENT_BINARY_DIR}/stage")
 
 set(resources "${stage}/lib/clang/${version}")
 
+set(toolchain "${CMAKE_TOOLCHAIN_FILE}")
+
+# The tools and the LLVM DLL have to share one C runtime. With the static one
+# each carries a copy of its own, and state such as the file descriptor table is
+# not shared between them. `llvm-ar x`, for one, closes a file descriptor that
+# the DLL opened, which its own copy of the runtime does not know of and
+# terminates the process over. libxml2 is linked into the DLL, so it follows.
+if(LLVM_RUNTIME_SHARED AND platform STREQUAL "win32")
+  set(toolchain "${CMAKE_CURRENT_BINARY_DIR}/toolchain/msvc-shared-runtime.cmake")
+
+  configure_file(cmake/msvc-shared-runtime.cmake.in "${toolchain}" @ONLY)
+endif()
+
 fetch_package(
   "github:llvm/llvm-project#llvmorg-${LLVM_RUNTIME_VERSION}"
   SOURCE_DIR source
@@ -68,13 +81,8 @@ if(platform STREQUAL "win32")
     -DLIBXML2_WITH_TESTS=OFF
   )
 
-  if(CMAKE_TOOLCHAIN_FILE)
-    list(APPEND libxml2_args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
-  endif()
-
-  # libxml2 is linked into the LLVM DLL, so it has to use the same C runtime.
-  if(LLVM_RUNTIME_SHARED)
-    list(APPEND libxml2_args "-DCMAKE_PROJECT_INCLUDE=${CMAKE_CURRENT_SOURCE_DIR}/cmake/msvc-shared-runtime.cmake")
+  if(toolchain)
+    list(APPEND libxml2_args "-DCMAKE_TOOLCHAIN_FILE=${toolchain}")
   endif()
 
   ExternalProject_Add(
@@ -161,8 +169,8 @@ list(APPEND args
   "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
 )
 
-if(CMAKE_TOOLCHAIN_FILE)
-  list(APPEND args "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}")
+if(toolchain)
+  list(APPEND args "-DCMAKE_TOOLCHAIN_FILE=${toolchain}")
 endif()
 
 set(build_targets distribution)

@@ -1,0 +1,12 @@
+# Wraps the toolchain file the build was configured with to select the shared C
+# runtime in place of the static one it selects. The toolchain file does so with
+# `set()`, which shadows a cache entry passed on the command line, so the choice
+# has to be made after it has run. Making it here rather than in the project
+# also reaches the checks a project compiles with `try_compile()`, which read
+# the toolchain file and nothing else of the project.
+
+if(NOT "@CMAKE_TOOLCHAIN_FILE@" STREQUAL "")
+  include("@CMAKE_TOOLCHAIN_FILE@")
+endif()
+
+set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreadedDLL)
