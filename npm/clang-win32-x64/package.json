@@ -1,6 +1,6 @@
 {
   "name": "llvm-runtime-clang-win32-x64",
-  "version": "23.1.2",
+  "version": "23.1.3",
   "description": "The Windows Intel 64-bit binaries for the LLVM compiler",
   "exports": {
     ".": "./index.js",
