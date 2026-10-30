@@ -21,6 +21,16 @@ option(LLVM_RUNTIME_SHARED "Build LLVM as a shared library" ON)
 
 option(LLVM_RUNTIME_RESOURCES "Build the clang resource directory for the target operating system" OFF)
 
+if(DEFINED ENV{ANDROID_NDK_LATEST_HOME})
+  set(android_ndk "$ENV{ANDROID_NDK_LATEST_HOME}")
+elseif(DEFINED ENV{ANDROID_NDK_HOME})
+  set(android_ndk "$ENV{ANDROID_NDK_HOME}")
+else()
+  set(android_ndk "")
+endif()
+
+set(LLVM_RUNTIME_ANDROID_NDK "${android_ndk}" CACHE PATH "The Android NDK whose sysroot the compiler runtime libraries for Android are built against")
+
 bare_platform(platform)
 bare_target(target)
 bare_target(host HOST)
@@ -186,7 +196,21 @@ if(LLVM_RUNTIME_RESOURCES)
     message(FATAL_ERROR "No compiler runtime configuration for '${platform}'")
   endif()
 
+  if(NOT LLVM_RUNTIME_ANDROID_NDK)
+    message(FATAL_ERROR
+      "No Android NDK to build the compiler runtime libraries for Android "
+      "against. Set ANDROID_NDK_HOME or LLVM_RUNTIME_ANDROID_NDK.\n"
+    )
+  endif()
+
   list(PREPEND args -C "${cache}")
+
+  # The initial cache is read where it appears on the command line, so what it
+  # reads has to come before it.
+  list(PREPEND args
+    "-DLLVM_RUNTIME_VERSION=${LLVM_RUNTIME_VERSION}"
+    "-DLLVM_RUNTIME_ANDROID_NDK=${LLVM_RUNTIME_ANDROID_NDK}"
+  )
 
   list(APPEND args -DLLVM_ENABLE_RUNTIMES=compiler-rt -DCOMPILER_RT_BUILD_BUILTINS=OFF)
 
@@ -372,4 +396,14 @@ if(LLVM_RUNTIME_RESOURCES)
     DESTINATION "resources-${platform}"
     USE_SOURCE_PERMISSIONS
   )
+
+  # CMake links every Android target against libatomic, whose routines the
+  # builtins have long since taken over. The NDK keeps an empty linker script in
+  # its place beside libunwind, and so does this.
+  foreach(arch IN ITEMS aarch64 arm i386 x86_64)
+    install(
+      FILES cmake/resources/android/libatomic.a
+      DESTINATION "resources-${platform}/lib/linux/${arch}"
+    )
+  endforeach()
 endif()

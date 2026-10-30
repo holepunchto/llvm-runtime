@@ -1,6 +1,6 @@
 # llvm-runtime
 
-Prebuilt LLVM toolchains for macOS, Linux, and Windows, with the compiler runtime libraries for every target of the host operating system.
+Prebuilt LLVM toolchains for macOS, Linux, and Windows, with the compiler runtime libraries for every target of the host operating system and for Android.
 
 ```
 npm i -g llvm-runtime
