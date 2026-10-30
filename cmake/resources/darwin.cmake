@@ -7,8 +7,13 @@
 # triple in `LLVM_RUNTIME_TARGETS` for this reason.
 
 include("${CMAKE_CURRENT_LIST_DIR}/wasi.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/android.cmake")
 
-set(LLVM_BUILTIN_TARGETS default ${wasi_targets} CACHE STRING "")
+set(LLVM_BUILTIN_TARGETS default ${wasi_targets} ${android_targets} CACHE STRING "")
+
+# Naming any runtime target leaves out the default one, which is the one that
+# builds the Apple runtimes, unless it is named too.
+set(LLVM_RUNTIME_TARGETS default ${android_targets} CACHE STRING "")
 
 set(COMPILER_RT_ENABLE_IOS ON CACHE BOOL "")
 set(COMPILER_RT_ENABLE_TVOS OFF CACHE BOOL "")
