@@ -78,8 +78,12 @@ foreach(target IN LISTS android_targets)
   endforeach()
 
   # Unlike libunwind, the builtins are named by architecture, so the targets
-  # can share the directory they are built into.
+  # can share the directory they are built into. libunwind must be built into a
+  # directory per target, which macOS and Windows hosts otherwise don't do, or
+  # the targets overwrite each other's library.
   set(BUILTINS_${target}_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR OFF CACHE BOOL "")
+
+  set(RUNTIMES_${target}_LLVM_ENABLE_PER_TARGET_RUNTIME_DIR ON CACHE BOOL "")
 
   set(RUNTIMES_${target}_LLVM_ENABLE_RUNTIMES libunwind CACHE STRING "")
 
