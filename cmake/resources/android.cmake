@@ -87,6 +87,11 @@ foreach(target IN LISTS android_targets)
 
   set(RUNTIMES_${target}_LLVM_ENABLE_RUNTIMES libunwind CACHE STRING "")
 
+  # CMake links everything for Android against libatomic, which isn't
+  # installed until after the build. Without it, every check that links fails
+  # and libunwind is built without the flags those checks enable.
+  set(RUNTIMES_${target}_CMAKE_EXE_LINKER_FLAGS "-L${CMAKE_CURRENT_LIST_DIR}/android" CACHE STRING "")
+
   # The driver only ever links the static libunwind, shared libraries included,
   # so it is position independent and its symbols are hidden, as in the NDK,
   # for a shared library linking it not to export it.
