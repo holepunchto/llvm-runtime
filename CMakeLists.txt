@@ -13,6 +13,8 @@ set(LLVM_RUNTIME_VERSION "23.1.5" CACHE STRING "The LLVM release to build")
 
 set(LLVM_RUNTIME_LIBXML2_VERSION "2.15.4" CACHE STRING "The libxml2 release to build for the manifest tool")
 
+set(LLVM_RUNTIME_ZSTD_VERSION "1.5.7" CACHE STRING "The zstd release to build for compressed debug sections")
+
 set(LLVM_RUNTIME_MUSL_VERSION "1.2.6" CACHE STRING "The musl release whose headers the compiler runtime libraries for musl are built against")
 
 set(LLVM_RUNTIME_BACKENDS "AArch64;ARM;Mips;RISCV;WebAssembly;X86" CACHE STRING "The LLVM backends to build")
@@ -120,6 +122,60 @@ if(platform STREQUAL "win32")
   list(APPEND dependencies libxml2)
 endif()
 
+set(zstd "${CMAKE_CURRENT_BINARY_DIR}/zstd")
+
+# Named so that LLVM's `Findzstd` takes it for a static library under MSVC as
+# well as elsewhere.
+set(zstd_library "${CMAKE_CURRENT_BINARY_DIR}/zstd-library/zstd_static${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
+fetch_package(
+  "github:facebook/zstd#v${LLVM_RUNTIME_ZSTD_VERSION}"
+  SOURCE_DIR zstd_source
+  SOURCE_SUBDIR fetch-only
+)
+
+set(zstd_args
+  "-DCMAKE_INSTALL_PREFIX=${zstd}"
+  "-DCMAKE_BUILD_TYPE=Release"
+  "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+
+  -DZSTD_BUILD_PROGRAMS=OFF
+  -DZSTD_BUILD_SHARED=OFF
+  -DZSTD_BUILD_STATIC=ON
+  -DZSTD_BUILD_TESTS=OFF
+  -DZSTD_LEGACY_SUPPORT=OFF
+  -DZSTD_MULTITHREAD_SUPPORT=OFF
+)
+
+if(toolchain)
+  list(APPEND zstd_args "-DCMAKE_TOOLCHAIN_FILE=${toolchain}")
+endif()
+
+ExternalProject_Add(
+  zstd
+  SOURCE_DIR "${zstd_source}"
+  SOURCE_SUBDIR build/cmake
+  BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/zstd-build"
+  DOWNLOAD_COMMAND ""
+  UPDATE_COMMAND ""
+  CMAKE_ARGS ${zstd_args}
+  INSTALL_COMMAND
+    ${CMAKE_COMMAND} -E rm -rf "${zstd}"
+  COMMAND
+    ${CMAKE_COMMAND} --build <BINARY_DIR> --target install
+  COMMAND
+    ${CMAKE_COMMAND}
+      -D "directory=${zstd}/lib"
+      -D "pattern=*zstd*${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      -D "destination=${zstd_library}"
+      -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/copy-library.cmake"
+  USES_TERMINAL_CONFIGURE ON
+  USES_TERMINAL_BUILD ON
+  USES_TERMINAL_INSTALL ON
+)
+
+list(APPEND dependencies zstd)
+
 # The compiler runtime libraries for the musl targets only need the headers of
 # musl, which need no compiler to install. They are an input to the build and
 # are never installed themselves. They land in the LLVM build directory, which
@@ -171,7 +227,7 @@ if(LLVM_RUNTIME_RESOURCES AND platform STREQUAL "linux")
   list(APPEND dependencies musl)
 endif()
 
-llvm_args("${platform}" "${target}" "${libxml2}" "${libxml2_library}" args)
+llvm_args("${platform}" "${target}" "${libxml2}" "${libxml2_library}" "${zstd}" "${zstd_library}" args)
 
 list(APPEND args
   "-DCMAKE_INSTALL_PREFIX=${stage}"
