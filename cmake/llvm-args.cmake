@@ -3,7 +3,7 @@ include_guard()
 # Assembles the arguments for the LLVM sub-build. List valued arguments are
 # separated by `|`, which `ExternalProject_Add()` turns back into `;` by way of
 # its `LIST_SEPARATOR` option.
-function(llvm_args platform target libxml2 libxml2_library result)
+function(llvm_args platform target libxml2 libxml2_library zstd zstd_library result)
   set(components
     clang
     clang-format
@@ -74,7 +74,6 @@ function(llvm_args platform target libxml2 libxml2_library result)
     -DLLVM_ENABLE_PLUGINS=OFF
     -DLLVM_ENABLE_TERMINFO=OFF
     -DLLVM_ENABLE_ZLIB=OFF
-    -DLLVM_ENABLE_ZSTD=OFF
     -DLLVM_INCLUDE_BENCHMARKS=OFF
     -DLLVM_INCLUDE_DOCS=OFF
     -DLLVM_INCLUDE_EXAMPLES=OFF
@@ -85,6 +84,18 @@ function(llvm_args platform target libxml2 libxml2_library result)
     # resource directory that lives in a separate package is wired up without
     # every invocation having to pass `-resource-dir`.
     -DCLANG_CONFIG_FILE_SYSTEM_DIR=../etc/clang
+  )
+
+  # lld has to read debug sections compressed with zstd, which is how the NDK
+  # ships the static libraries of its sysroot. A linker without zstd support
+  # fails every static link for Android. zstd is built alongside us and linked
+  # statically for the same reasons as libxml2 below.
+  list(APPEND args
+    -DLLVM_ENABLE_ZSTD=FORCE_ON
+    -DLLVM_USE_STATIC_ZSTD=ON
+    "-Dzstd_INCLUDE_DIR=${zstd}/include"
+    "-Dzstd_LIBRARY=${zstd_library}"
+    "-Dzstd_STATIC_LIBRARY=${zstd_library}"
   )
 
   # CMake drives the manifest tool itself when linking for an MSVC target, so
