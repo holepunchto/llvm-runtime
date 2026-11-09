@@ -1,6 +1,6 @@
 {
   "name": "llvm-runtime-resources-win32",
-  "version": "23.1.6-0",
+  "version": "23.1.6-1",
   "description": "The compiler runtime libraries for Windows",
   "exports": {
     ".": "./index.js",
